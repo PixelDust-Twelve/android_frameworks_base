@@ -56,4 +56,7 @@
     <string name="qs_data_switch_label">Daten SIM wechseln</string>
     <string name="qs_data_switch_changed_1">Wechsel die Daten SIM auf SIM 1.</string>
     <string name="qs_data_switch_changed_2">Wechsel die Daten SIM auf SIM 2.</string>
+
+    <!-- Statusbar tuner -->
+    <string name="statusbar_items_title">Symbole in der Statusleiste</string>
 </resources>
