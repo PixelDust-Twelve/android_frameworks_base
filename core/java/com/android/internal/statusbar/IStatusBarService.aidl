@@ -165,7 +165,11 @@ interface IStatusBarService
     void startAssist(in Bundle args);
 
     /**
-     * Aex
+     * Custom extensions
      */
     void toggleCameraFlash();
+    void toggleRecentApps();
+    void toggleSplitScreen();
+    void preloadRecentApps();
+    void cancelPreloadRecentApps();
 }
