@@ -641,6 +641,9 @@ public class KeyguardIndicationController {
                      Settings.System.OMNI_KEYGUARD_SHOW_BATTERY_BAR, 0, UserHandle.USER_CURRENT) == 1;
             boolean showBatteryBarAlways = Settings.System.getIntForUser(mContext.getContentResolver(),
                      Settings.System.OMNI_KEYGUARD_SHOW_BATTERY_BAR_ALWAYS, 0, UserHandle.USER_CURRENT) == 1;
+            boolean showAmbientBattery = Settings.System.getIntForUser(mContext.getContentResolver(),
+                     Settings.System.AMBIENT_BATTERY_PERCENT, 1, UserHandle.USER_CURRENT) == 1;
+
             // A few places might need to hide the indication, so always start by making it visible
             mIndicationArea.setVisibility(VISIBLE);
 
@@ -676,9 +679,13 @@ public class KeyguardIndicationController {
                         mBatteryBar.setBarColor(Color.WHITE);
                     }
                 } else {
-                    String percentage = NumberFormat.getPercentInstance()
-                            .format(mBatteryLevel / 100f);
-                    mTopIndicationView.switchIndication(percentage, null, animate);
+                    if (showAmbientBattery) {
+                        String percentage = NumberFormat.getPercentInstance()
+                                .format(mBatteryLevel / 100f);
+                        mTopIndicationView.switchIndication(percentage, null, animate);
+                    } else {
+                        mTopIndicationView.switchIndication(null, animate);
+                    }
                     if (showBatteryBarAlways) {
                         mBatteryBar.setVisibility(View.VISIBLE);
                         mBatteryBar.setBatteryPercent(mBatteryLevel);
