@@ -64,4 +64,7 @@
 
     <!-- Shows when people have clicked on the custom lockscreen shortcut [CHAR LIMIT=60] -->
     <string name="custom_hint">Vom Symbol aus wischen zum Starten</string>
+
+    <!-- PixelDust Settings Tile -->
+    <string name="quick_settings_pixeldust_label">PixelDust Einstellungen</string>
 </resources>
