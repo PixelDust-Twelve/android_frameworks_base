@@ -124,7 +124,8 @@ public class MobileSignalController extends SignalController<MobileState, Mobile
     private ImsManager mImsManager;
     private FeatureConnector<ImsManager> mFeatureConnector;
     private int mCallState = TelephonyManager.CALL_STATE_IDLE;
-    private boolean mShowVolteIcon;
+
+    private int mVoLTEicon = 0;
 
     private final MobileStatusTracker.Callback mMobileCallback =
             new MobileStatusTracker.Callback() {
@@ -254,8 +255,6 @@ public class MobileSignalController extends SignalController<MobileState, Mobile
         mLastState.enabled = mCurrentState.enabled = hasMobileData;
         mLastState.iconGroup = mCurrentState.iconGroup = mDefaultIcons;
 
-        mShowVolteIcon = false;
-
         int phoneId = mSubscriptionInfo.getSimSlotIndex();
         mFeatureConnector = new FeatureConnector(mContext, phoneId,
                 new FeatureConnector.ManagerFactory<ImsManager> () {
@@ -313,6 +312,9 @@ public class MobileSignalController extends SignalController<MobileState, Mobile
             resolver.registerContentObserver(
                     Settings.System.getUriFor(Settings.System.ROAMING_INDICATOR_ICON), false,
                     this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.VOLTE_ICON_STYLE), false,
+                    this, UserHandle.USER_ALL);
             updateSettings();
         }
 
@@ -333,6 +335,9 @@ public class MobileSignalController extends SignalController<MobileState, Mobile
         mRoamingIconAllowed = Settings.System.getIntForUser(resolver,
                 Settings.System.ROAMING_INDICATOR_ICON, 1,
                 UserHandle.USER_CURRENT) == 1;
+        mVoLTEicon = Settings.System.getIntForUser(resolver,
+                Settings.System.VOLTE_ICON_STYLE, 0,
+                UserHandle.USER_CURRENT);
         mConfig = Config.readConfig(mContext);
         setConfiguration(mConfig);
         notifyListeners();
@@ -464,15 +469,45 @@ public class MobileSignalController extends SignalController<MobileState, Mobile
     }
 
     private boolean isVolteSwitchOn() {
-        return mImsManager != null && mImsManager.isEnhanced4gLteModeSettingEnabledByUser();
+        return mImsManager != null && mVoLTEicon > 0;
     }
 
     private int getVolteResId() {
         int resId = 0;
 
-        if ( (mCurrentState.voiceCapable || mCurrentState.videoCapable)
-                &&  mCurrentState.imsRegistered ) {
-            resId = R.drawable.ic_volte;
+        if ((mCurrentState.voiceCapable || mCurrentState.videoCapable)
+                &&  mCurrentState.imsRegistered) {
+            switch (mVoLTEicon) {
+                case 1:
+                    resId = R.drawable.ic_volte1;
+                    break;
+                case 2:
+                    resId = R.drawable.ic_volte2;
+                    break;
+                case 3:
+                    resId = R.drawable.ic_volte3;
+                    break;
+                case 4:
+                    resId = R.drawable.ic_volte4;
+                    break;
+                case 5:
+                    resId = R.drawable.ic_volte5;
+                    break;
+                case 6:
+                    resId = R.drawable.ic_volte6;
+                    break;
+                case 7:
+                    resId = R.drawable.ic_volte7;
+                    break;
+                case 8:
+                    resId = R.drawable.ic_volte8; // EMUI icon
+                    break;
+                case 9:
+                    resId = R.drawable.ic_volte9; //Oneplus Compact
+                    break;
+                default:
+                    break;
+            }
         }
         return resId;
     }
@@ -549,7 +584,7 @@ public class MobileSignalController extends SignalController<MobileState, Mobile
         final QsInfo qsInfo = getQsInfo(contentDescription, icons.dataType);
         final SbInfo sbInfo = getSbInfo(contentDescription, icons.dataType);
 
-        int volteId = mShowVolteIcon && isVolteSwitchOn() ? getVolteResId() : 0;
+        int volteId = isVolteSwitchOn() ? getVolteResId() : 0;
 
         MobileDataIndicators mobileDataIndicators = new MobileDataIndicators(
                 sbInfo.icon,
@@ -1090,7 +1125,7 @@ public class MobileSignalController extends SignalController<MobileState, Mobile
     private final BroadcastReceiver mVolteSwitchObserver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             Log.d(mTag, "action=" + intent.getAction());
-            if (mShowVolteIcon) {
+            if (isVolteSwitchOn()) {
                 notifyListeners();
             }
         }
