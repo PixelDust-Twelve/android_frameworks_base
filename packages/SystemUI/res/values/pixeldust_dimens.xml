@@ -27,4 +27,6 @@
 
     <!-- AoD battery bar -->
     <dimen name="battery_bar_view_height">4dp</dimen>
+
+    <dimen name="screenrecord_dot_size">48dp</dimen>
 </resources>
