@@ -60,4 +60,9 @@
     <string name="screenrecord_stopdot_label">Stopp-Punkt anzeigen\nLang drücken, um zu verschieben</string>
     <string name="screenrecord_lowquality_label">Qualität reduzieren für kleinere Dateigröße</string>
     <string name="screenrecord_longer_timeout_switch_label">Dateigrößenbeschränkung anheben\nAufnahmegröße auf 15GiB setzen</string>
+
+    <!-- Extended/"L" back swipe to trigger actions/app/activities -->
+    <string name="app_picker_dialog_title">Eine App auswählen</string>
+    <string name="active_edge_app_select_title">App auswählen</string>
+    <string name="active_edge_activity_select_title">Aktivität auswählen</string>
 </resources>
