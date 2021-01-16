@@ -3858,6 +3858,12 @@ public class StatusBar extends SystemUI implements DemoMode,
 
         mNotificationPanelViewController.setDozing(mDozing, animate, mWakeUpTouchLocation);
         updateQsExpansionEnabled();
+
+        if (mAmbientIndicationContainer != null) {
+            ((AmbientIndicationContainer)mAmbientIndicationContainer)
+                    .updateDozingState(mDozing);
+        }
+
         Trace.endSection();
     }
 
@@ -4028,6 +4034,11 @@ public class StatusBar extends SystemUI implements DemoMode,
         updateScrimController();
         mPresenter.updateMediaMetaData(false, mState != StatusBarState.KEYGUARD);
         updateKeyguardState();
+
+        if (mAmbientIndicationContainer != null) {
+            ((AmbientIndicationContainer)mAmbientIndicationContainer)
+                    .updateKeyguardState(mState == StatusBarState.KEYGUARD);
+        }
         Trace.endSection();
     }
 
