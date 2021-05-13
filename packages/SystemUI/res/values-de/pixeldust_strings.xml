@@ -59,6 +59,7 @@
     <string name="screenrecord_delete_description">Bildschirmaufnahme gelöscht</string>
     <string name="screenrecord_stopdot_label">Stopp-Punkt anzeigen\nLang drücken, um zu verschieben</string>
     <string name="screenrecord_lowquality_label">Qualität/Dateigröße reduzieren</string>
+    <string name="screenrecord_longer_timeout_switch_label">Dateigrößenbeschränkung anheben\nAufnahmegröße auf 15GiB setzen</string>
 
     <!-- Extended/"L" back swipe to trigger actions/app/activities -->
     <string name="app_picker_dialog_title">Eine App auswählen</string>
