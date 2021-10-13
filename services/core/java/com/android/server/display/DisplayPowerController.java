@@ -1393,8 +1393,9 @@ final class DisplayPowerController implements AutomaticBrightnessController.Call
             final float currentBrightness = mPowerState.getScreenBrightness();
             final float currentSdrBrightness = mPowerState.getSdrScreenBrightness();
             if (isValidBrightnessValue(animateValue)
-                    && (animateValue != currentBrightness
-                    || sdrAnimateValue != currentSdrBrightness)) {
+                    && (!BrightnessSynchronizer.floatEquals(animateValue, currentBrightness)
+                    || !BrightnessSynchronizer.floatEquals(
+                            sdrAnimateValue, currentSdrBrightness))) {
                 if (initialRampSkip || hasBrightnessBuckets
                         || wasOrWillBeInVr || !isDisplayContentVisible || brightnessIsTemporary) {
                     animateScreenBrightness(animateValue, sdrAnimateValue,
@@ -1740,10 +1741,11 @@ final class DisplayPowerController implements AutomaticBrightnessController.Call
                 mHbmController.getCurrentBrightnessMin(), mHbmController.getCurrentBrightnessMax());
     }
 
-    // Checks whether the brightness is within the valid brightness range, not including off.
-    private boolean isValidBrightnessValue(float brightness) {
-        return brightness >= PowerManager.BRIGHTNESS_MIN
-                && brightness <= PowerManager.BRIGHTNESS_MAX;
+    // Checks whether the brightness is within the valid brightness range, not including the off or
+    // invalid states.
+    private boolean isValidBrightnessValue(float brightnessState) {
+        return brightnessState >= PowerManager.BRIGHTNESS_MIN
+                && brightnessState <= PowerManager.BRIGHTNESS_MAX;
     }
 
     private void animateScreenBrightness(float target, float sdrTarget, float rate) {
@@ -2073,9 +2075,6 @@ final class DisplayPowerController implements AutomaticBrightnessController.Call
     }
 
     private void putScreenBrightnessSetting(float brightnessValue, boolean updateCurrent) {
-        if (!isValidBrightnessValue(brightnessValue)) {
-            return;
-        }
         if (updateCurrent) {
             setCurrentScreenBrightness(brightnessValue);
         }
@@ -2125,7 +2124,8 @@ final class DisplayPowerController implements AutomaticBrightnessController.Call
                 || mPendingScreenBrightnessSetting < 0.0f)) {
             return treatAsIfUserChanged;
         }
-        if (mCurrentScreenBrightnessSetting == mPendingScreenBrightnessSetting) {
+        if (BrightnessSynchronizer.floatEquals(
+                mCurrentScreenBrightnessSetting, mPendingScreenBrightnessSetting)) {
             mPendingScreenBrightnessSetting = PowerManager.BRIGHTNESS_INVALID_FLOAT;
             mTemporaryScreenBrightness = PowerManager.BRIGHTNESS_INVALID_FLOAT;
             return treatAsIfUserChanged;
