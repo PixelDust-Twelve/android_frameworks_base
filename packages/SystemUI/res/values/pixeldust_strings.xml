@@ -125,4 +125,7 @@
     <!-- Screenshot QS tile -->
     <string name="quick_settings_screenshot_label">Screenshot</string>
     <string name="quick_settings_region_screenshot_label">Partial screenshot</string>
+
+    <!-- Allow hiding call strength icons -->
+    <string name="quick_settings_call_strength">Call strength icons</string>
 </resources>
