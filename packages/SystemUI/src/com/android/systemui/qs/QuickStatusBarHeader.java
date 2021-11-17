@@ -50,6 +50,7 @@ import com.android.systemui.statusbar.phone.StatusBarIconController.TintedIconMa
 import com.android.systemui.statusbar.phone.StatusBarWindowView;
 import com.android.systemui.statusbar.phone.StatusIconContainer;
 import com.android.systemui.statusbar.policy.Clock;
+import com.android.systemui.statusbar.policy.NetworkTraffic;
 
 import java.util.List;
 
@@ -74,6 +75,7 @@ public class QuickStatusBarHeader extends FrameLayout implements
     private View mSecurityHeaderView;
     private View mClockIconsView;
     private View mContainer;
+    private NetworkTraffic mNetworkTraffic;
 
     private View mQSCarriers;
     private Clock mClockView;
@@ -149,6 +151,7 @@ public class QuickStatusBarHeader extends FrameLayout implements
         mRightLayout = findViewById(R.id.rightLayout);
         mDateContainer = findViewById(R.id.date_container);
         mPrivacyContainer = findViewById(R.id.privacy_container);
+        mNetworkTraffic = findViewById(R.id.networkTraffic);
 
         mClockView = findViewById(R.id.clock);
         mClockView.setQsHeader();
@@ -306,6 +309,7 @@ public class QuickStatusBarHeader extends FrameLayout implements
                     android.R.attr.textColorSecondary);
             mTextColorPrimary = textColor;
             mClockView.setTextColor(textColor);
+            mNetworkTraffic.setTintColor(textColor);
             if (mTintedIconManager != null) {
                 mTintedIconManager.setTint(textColor);
             }
@@ -341,6 +345,7 @@ public class QuickStatusBarHeader extends FrameLayout implements
                 // These views appear on expanding down
                 .addFloat(mClockView, "alpha", 0, 1)
                 .addFloat(mQSCarriers, "alpha", 0, 1)
+                .addFloat(mNetworkTraffic, "alpha", 0, 1)
                 // Use statusbar paddings when collapsed, align with QS when expanded, and animate translation
                 .addFloat(mClockContainer, "translationX", mHeaderPaddingLeft + mStatusBarPaddingStart, 0)
                 .addFloat(mRightLayout, "translationX", -(mHeaderPaddingRight + mStatusBarPaddingEnd), 0)
