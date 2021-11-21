@@ -57,9 +57,12 @@
     <string name="screenrecord_delete_label">Löschen</string>
     <!-- A toast message shown after successfully deleting a screen recording [CHAR LIMIT=NONE] -->
     <string name="screenrecord_delete_description">Bildschirmaufnahme gelöscht</string>
-    <string name="screenrecord_stopdot_label">Stopp-Punkt anzeigen\nVerschieben per Longpress</string>
-    <string name="screenrecord_lowquality_label">Qualität/Dateigröße reduzieren</string>
-    <string name="screenrecord_longer_timeout_switch_label">Aufnahmegröße auf 15GiB hochsetzen</string>
+    <string name="screenrecord_stopdot_label">Stopp-Punkt anzeigen</string>
+    <string name="screenrecord_stopdot_summary">Verschieben per Longpress</string>
+    <string name="screenrecord_lowquality_label">Qualität reduzieren</string>
+    <string name="screenrecord_lowquality_summary">Für kleinere Dateigröße</string>
+    <string name="screenrecord_longer_timeout_switch_label">Aufnahmegröße erhöhen</string>
+    <string name="screenrecord_longer_timeout_switch_summary">Auf 15GB hochsetzen</string>
 
     <!-- Extended/"L" back swipe to trigger actions/app/activities -->
     <string name="app_picker_dialog_title">Eine App auswählen</string>
