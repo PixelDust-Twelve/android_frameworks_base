@@ -62,6 +62,7 @@ android_library {
         "res-keyguard",
         "res",
         "res-hwkeys",
+        "res-pixel",
     ],
     static_libs: [
         "WindowManager-Shell",
@@ -99,12 +100,15 @@ android_library {
         "tensorflowlite_java",
         "colorkt",
         "themelib",
+        "tensorflowlite_java",
+        "SystemUIGoogle-lib",
     ],
     manifest: "AndroidManifest.xml",
 
     libs: [
         "ims-common",
     ],
+    additional_manifests: ["SystemUIGoogle-Manifest.xml"],
 
     kotlincflags: ["-Xjvm-default=enable"],
 
@@ -213,6 +217,11 @@ android_app {
     jni_libs: ["libtensorflowlite_jni"],
     use_embedded_native_libs: true,
     resource_dirs: [],
+    asset_dirs: ["assets"],
+    aaptflags: [
+        "-0 .tflite",
+        "-0 .vocab",
+    ],
 
     platform_apis: true,
     system_ext_specific: true,
