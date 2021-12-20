@@ -58,8 +58,8 @@
     <string name="qs_data_switch_changed_1">Wechsel die Daten SIM auf SIM 1.</string>
     <string name="qs_data_switch_changed_2">Wechsel die Daten SIM auf SIM 2.</string>
 
-    <!-- SystemUI tuner -->
-    <string name="statusbar_items_title">Symbole in der Statusleiste</string>
+    <!-- SystemUI Tuner -->
+    <string name="statusbar_items_title">Statusleisten-Symbole</string>
     <string name="lockscreen_default">Standard</string>
     <string name="lockscreen_hidden">Keine</string>
     <string name="systemui_tuner_navbar_title">Layout</string>
