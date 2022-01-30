@@ -656,19 +656,19 @@ public class KeyguardIndicationController {
                 // colors can be hard to read in low brightness.
                 mTopIndicationView.setTextColor(Color.WHITE);
                 if (!TextUtils.isEmpty(mTransientIndication)) {
-                    mTopIndicationView.switchIndication(mTransientIndication, null);
+                    mTopIndicationView.switchIndication(mTransientIndication, null, animate);
                 } else if (!mBatteryPresent) {
                     // If there is no battery detected, hide the indication and bail
                     mIndicationArea.setVisibility(GONE);
                 } else if (!TextUtils.isEmpty(mAlignmentIndication)) {
-                    mTopIndicationView.switchIndication(mAlignmentIndication, null);
+                    mTopIndicationView.switchIndication(mAlignmentIndication, null, animate);
                     mTopIndicationView.setTextColor(mContext.getColor(R.color.misalignment_text_color));
                 } else if (mPowerPluggedIn || mEnableBatteryDefender) {
                     String indication = computePowerIndication();
                     if (animate) {
                         animateText(mTopIndicationView, indication);
                     } else {
-                        mTopIndicationView.switchIndication(indication, null);
+                        mTopIndicationView.switchIndication(indication, null, animate);
                     }
                     if (showBatteryBar || showBatteryBarAlways) {
                         mBatteryBar.setVisibility(View.VISIBLE);
@@ -678,7 +678,7 @@ public class KeyguardIndicationController {
                 } else {
                     String percentage = NumberFormat.getPercentInstance()
                             .format(mBatteryLevel / 100f);
-                    mTopIndicationView.switchIndication(percentage, null);
+                    mTopIndicationView.switchIndication(percentage, null, animate);
                     if (showBatteryBarAlways) {
                         mBatteryBar.setVisibility(View.VISIBLE);
                         mBatteryBar.setBatteryPercent(mBatteryLevel);
