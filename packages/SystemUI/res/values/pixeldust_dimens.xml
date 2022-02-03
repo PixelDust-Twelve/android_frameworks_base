@@ -27,4 +27,7 @@
 
     <!-- AoD battery bar -->
     <dimen name="battery_bar_view_height">6dp</dimen>
+
+    <!-- Network traffic font size -->
+    <dimen name="net_traffic_multi_text_size">18dp</dimen>
 </resources>
