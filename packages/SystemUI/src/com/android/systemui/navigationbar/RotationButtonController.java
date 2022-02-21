@@ -180,7 +180,7 @@ public class RotationButtonController {
         TaskStackChangeListeners.getInstance().unregisterTaskStackListener(mTaskStackListener);
     }
 
-    public void addRotationCallback(Consumer<Integer> watcher) {
+    public void setRotationCallback(Consumer<Integer> watcher) {
         mRotWatcherListener = watcher;
     }
 

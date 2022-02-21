@@ -359,6 +359,7 @@ public class DisplayPolicy {
     private boolean mAllowLockscreenWhenOn;
 
     private PointerLocationView mPointerLocationView;
+    private int mDisplayCutoutTouchableRegionSize;
 
     private SettingsObserver mSettingsObserver;
 
@@ -1104,8 +1105,21 @@ public class DisplayPolicy {
                         (displayFrames, windowState, rect) -> {
                             rect.bottom = rect.top + getStatusBarHeight(displayFrames);
                         };
+                final TriConsumer<DisplayFrames, WindowState, Rect> gestureFrameProvider =
+                        (displayFrames, windowState, rect) -> {
+                            rect.bottom = rect.top + getStatusBarHeight(displayFrames);
+                            final DisplayCutout cutout =
+                                    displayFrames.mInsetsState.getDisplayCutout();
+                            if (cutout != null) {
+                                final Rect top = cutout.getBoundingRectTop();
+                                if (!top.isEmpty()) {
+                                    rect.bottom = rect.bottom + mDisplayCutoutTouchableRegionSize;
+                                }
+                            }
+                        };
                 mDisplayContent.setInsetProvider(ITYPE_STATUS_BAR, win, frameProvider);
-                mDisplayContent.setInsetProvider(ITYPE_TOP_MANDATORY_GESTURES, win, frameProvider);
+                mDisplayContent.setInsetProvider(
+                        ITYPE_TOP_MANDATORY_GESTURES, win, gestureFrameProvider);
                 mDisplayContent.setInsetProvider(ITYPE_TOP_TAPPABLE_ELEMENT, win, frameProvider);
                 break;
             case TYPE_NAVIGATION_BAR:
@@ -2032,11 +2046,14 @@ public class DisplayPolicy {
             mStatusBarHeightForRotation[landscapeRotation] =
                     mStatusBarHeightForRotation[seascapeRotation] =
                             res.getDimensionPixelSize(R.dimen.status_bar_height_landscape);
+            mDisplayCutoutTouchableRegionSize = res.getDimensionPixelSize(
+                    R.dimen.display_cutout_touchable_region_size);
         } else {
             mStatusBarHeightForRotation[portraitRotation] =
                     mStatusBarHeightForRotation[upsideDownRotation] =
                             mStatusBarHeightForRotation[landscapeRotation] =
                                     mStatusBarHeightForRotation[seascapeRotation] = 0;
+            mDisplayCutoutTouchableRegionSize = 0;
         }
 
         // Height of the navigation bar when presented horizontally at bottom
@@ -3019,6 +3036,7 @@ public class DisplayPolicy {
         pw.print(" mAllowLockscreenWhenOn="); pw.println(mAllowLockscreenWhenOn);
         pw.print(prefix); pw.print("mRemoteInsetsControllerControlsSystemBars=");
         pw.println(mDisplayContent.getInsetsPolicy().getRemoteInsetsControllerControlsSystemBars());
+        mSystemGestures.dump(pw, prefix);
 
         pw.print(prefix); pw.println("Looper state:");
         mHandler.getLooper().dump(new PrintWriterPrinter(pw), prefix + "  ");

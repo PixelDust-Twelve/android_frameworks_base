@@ -567,6 +567,53 @@ public class WallpaperManager {
             return null;
         }
 
+        public Rect peekWallpaperDimensions(Context context, boolean returnDefault, int userId) {
+            if (mService != null) {
+                try {
+                    if (!mService.isWallpaperSupported(context.getOpPackageName())) {
+                        return new Rect();
+                    }
+                } catch (RemoteException e) {
+                    throw e.rethrowFromSystemServer();
+                }
+            }
+
+            Rect dimensions = null;
+            synchronized (this) {
+                try {
+                    Bundle params = new Bundle();
+                    // Let's peek user wallpaper first.
+                    ParcelFileDescriptor pfd = mService.getWallpaperWithFeature(
+                            context.getOpPackageName(), context.getAttributionTag(), this,
+                            FLAG_SYSTEM, params, userId);
+                    if (pfd != null) {
+                        BitmapFactory.Options options = new BitmapFactory.Options();
+                        options.inJustDecodeBounds = true;
+                        BitmapFactory.decodeFileDescriptor(pfd.getFileDescriptor(), null, options);
+                        dimensions = new Rect(0, 0, options.outWidth, options.outHeight);
+                    }
+                } catch (RemoteException ex) {
+                    Log.w(TAG, "peek wallpaper dimensions failed", ex);
+                }
+            }
+            // If user wallpaper is unavailable, may be the default one instead.
+            if ((dimensions == null || dimensions.width() == 0 || dimensions.height() == 0)
+                    && returnDefault) {
+                InputStream is = openDefaultWallpaper(context, FLAG_SYSTEM);
+                if (is != null) {
+                    try {
+                        BitmapFactory.Options options = new BitmapFactory.Options();
+                        options.inJustDecodeBounds = true;
+                        BitmapFactory.decodeStream(is, null, options);
+                        dimensions = new Rect(0, 0, options.outWidth, options.outHeight);
+                    } finally {
+                        IoUtils.closeQuietly(is);
+                    }
+                }
+            }
+            return dimensions;
+        }
+
         void forgetLoadedWallpaper() {
             synchronized (this) {
                 mCachedWallpaper = null;
@@ -1047,6 +1094,17 @@ public class WallpaperManager {
     }
 
     /**
+     * Peek the dimensions of system wallpaper of the user without decoding it.
+     *
+     * @return the dimensions of system wallpaper
+     * @hide
+     */
+    public Rect peekBitmapDimensions() {
+        return sGlobals.peekWallpaperDimensions(
+                mContext, true /* returnDefault */, mContext.getUserId());
+    }
+
+    /**
      * Get an open, readable file descriptor to the given wallpaper image file.
      * The caller is responsible for closing the file descriptor when done ingesting the file.
      *
@@ -1402,18 +1460,27 @@ public class WallpaperManager {
                     mContext.getUserId());
             if (fd != null) {
                 FileOutputStream fos = null;
-                boolean ok = false;
+                final Bitmap tmp = BitmapFactory.decodeStream(resources.openRawResource(resid));
                 try {
-                    fos = new ParcelFileDescriptor.AutoCloseOutputStream(fd);
-                    copyStreamToWallpaperFile(resources.openRawResource(resid), fos);
-                    // The 'close()' is the trigger for any server-side image manipulation,
-                    // so we must do that before waiting for completion.
-                    fos.close();
-                    completion.waitForCompletion();
+                    // If the stream can't be decoded, treat it as an invalid input.
+                    if (tmp != null) {
+                        fos = new ParcelFileDescriptor.AutoCloseOutputStream(fd);
+                        tmp.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                        // The 'close()' is the trigger for any server-side image manipulation,
+                        // so we must do that before waiting for completion.
+                        fos.close();
+                        completion.waitForCompletion();
+                    } else {
+                        throw new IllegalArgumentException(
+                                "Resource 0x" + Integer.toHexString(resid) + " is invalid");
+                    }
                 } finally {
                     // Might be redundant but completion shouldn't wait unless the write
                     // succeeded; this is a fallback if it threw past the close+wait.
                     IoUtils.closeQuietly(fos);
+                    if (tmp != null) {
+                        tmp.recycle();
+                    }
                 }
             }
         } catch (RemoteException e) {
@@ -1655,13 +1722,22 @@ public class WallpaperManager {
                     result, which, completion, mContext.getUserId());
             if (fd != null) {
                 FileOutputStream fos = null;
+                final Bitmap tmp = BitmapFactory.decodeStream(bitmapData);
                 try {
-                    fos = new ParcelFileDescriptor.AutoCloseOutputStream(fd);
-                    copyStreamToWallpaperFile(bitmapData, fos);
-                    fos.close();
-                    completion.waitForCompletion();
+                    // If the stream can't be decoded, treat it as an invalid input.
+                    if (tmp != null) {
+                        fos = new ParcelFileDescriptor.AutoCloseOutputStream(fd);
+                        tmp.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                        fos.close();
+                        completion.waitForCompletion();
+                    } else {
+                        throw new IllegalArgumentException("InputStream is invalid");
+                    }
                 } finally {
                     IoUtils.closeQuietly(fos);
+                    if (tmp != null) {
+                        tmp.recycle();
+                    }
                 }
             }
         } catch (RemoteException e) {

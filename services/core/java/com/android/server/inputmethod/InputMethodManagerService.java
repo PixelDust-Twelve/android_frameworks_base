@@ -2614,14 +2614,12 @@ public class InputMethodManagerService extends IInputMethodManager.Stub
         }
 
         if (mCurToken != null) {
-            try {
-                if (DEBUG) {
-                    Slog.v(TAG, "Removing window token: " + mCurToken + " for display: "
-                            + mCurTokenDisplayId);
-                }
-                mIWindowManager.removeWindowToken(mCurToken, mCurTokenDisplayId);
-            } catch (RemoteException e) {
+            if (DEBUG) {
+                Slog.v(TAG, "Removing window token: " + mCurToken + " for display: "
+                        + mCurTokenDisplayId);
             }
+            mWindowManagerInternal.removeWindowToken(mCurToken, false /* removeWindows */,
+                    false /* animateExit */, mCurTokenDisplayId);
             // Set IME window status as invisible when unbind current method.
             mImeWindowVis = 0;
             mBackDisposition = InputMethodService.BACK_DISPOSITION_DEFAULT;
@@ -2871,7 +2869,7 @@ public class InputMethodManagerService extends IInputMethodManager.Stub
                 return;
             }
             final IBinder targetWindow = mImeTargetWindowMap.get(startInputToken);
-            if (targetWindow != null && mLastImeTargetWindow != targetWindow) {
+            if (targetWindow != null) {
                 mWindowManagerInternal.updateInputMethodTargetWindow(token, targetWindow);
             }
             mLastImeTargetWindow = targetWindow;

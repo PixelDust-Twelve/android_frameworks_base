@@ -124,7 +124,6 @@ public class PhoneFallbackEventHandler implements FallbackEventHandler {
                         Intent intent = new Intent(Intent.ACTION_VOICE_COMMAND);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         try {
-                            sendCloseSystemWindows();
                             mContext.startActivity(intent);
                         } catch (ActivityNotFoundException e) {
                             startCallActivity();
@@ -165,7 +164,6 @@ public class PhoneFallbackEventHandler implements FallbackEventHandler {
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             try {
                                 mView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
-                                sendCloseSystemWindows();
                                 getSearchManager().stopSearch();
                                 mContext.startActivity(intent);
                                 // Only clear this if we successfully start the
@@ -259,7 +257,6 @@ public class PhoneFallbackEventHandler implements FallbackEventHandler {
 
     @UnsupportedAppUsage
     void startCallActivity() {
-        sendCloseSystemWindows();
         Intent intent = new Intent(Intent.ACTION_CALL_BUTTON);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         try {
@@ -304,10 +301,6 @@ public class PhoneFallbackEventHandler implements FallbackEventHandler {
                     (MediaSessionManager) mContext.getSystemService(Context.MEDIA_SESSION_SERVICE);
         }
         return mMediaSessionManager;
-    }
-
-    void sendCloseSystemWindows() {
-        PhoneWindow.sendCloseSystemWindows(mContext, null);
     }
 
     private void handleVolumeKeyEvent(KeyEvent keyEvent) {

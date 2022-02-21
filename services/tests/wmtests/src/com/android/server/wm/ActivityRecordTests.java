@@ -37,8 +37,10 @@ import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 import static android.os.Process.NOBODY_UID;
 import static android.view.Display.DEFAULT_DISPLAY;
+import static android.view.InsetsState.ITYPE_IME;
 import static android.view.WindowManager.LayoutParams.FIRST_APPLICATION_WINDOW;
 import static android.view.WindowManager.LayoutParams.FIRST_SUB_WINDOW;
+import static android.view.WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM;
 import static android.view.WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD;
 import static android.view.WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED;
 import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION;
@@ -126,6 +128,8 @@ import android.view.IRemoteAnimationFinishedCallback;
 import android.view.IRemoteAnimationRunner.Stub;
 import android.view.IWindowManager;
 import android.view.IWindowSession;
+import android.view.InsetsSource;
+import android.view.InsetsState;
 import android.view.RemoteAnimationAdapter;
 import android.view.RemoteAnimationTarget;
 import android.view.Surface;
@@ -2814,6 +2818,108 @@ public class ActivityRecordTests extends WindowTestsBase {
         assertFalse(activity.mVisibleRequested);
         assertFalse(activity.mDisplayContent.mOpeningApps.contains(activity));
         assertFalse(activity.mDisplayContent.mClosingApps.contains(activity));
+    }
+
+    @Test
+    public void testImeInsetsFrozenFlag_resetWhenReparented() {
+        final ActivityRecord activity = createActivityWithTask();
+        final WindowState app = createWindow(null, TYPE_APPLICATION, activity, "app");
+        final WindowState imeWindow = createWindow(null, TYPE_APPLICATION, "imeWindow");
+        final Task newTask = new TaskBuilder(mSupervisor).build();
+        makeWindowVisible(app, imeWindow);
+        mDisplayContent.mInputMethodWindow = imeWindow;
+        mDisplayContent.setImeLayeringTarget(app);
+        mDisplayContent.setImeInputTarget(app);
+
+        // Simulate app is closing and expect the last IME is shown and IME insets is frozen.
+        app.mActivityRecord.commitVisibility(false, false);
+        assertTrue(app.mActivityRecord.mLastImeShown);
+        assertTrue(app.mActivityRecord.mImeInsetsFrozenUntilStartInput);
+
+        // Expect IME insets frozen state will reset when the activity is reparent to the new task.
+        activity.setState(RESUMED, "test");
+        activity.reparent(newTask, 0 /* top */, "test");
+        assertFalse(app.mActivityRecord.mImeInsetsFrozenUntilStartInput);
+    }
+
+    @UseTestDisplay(addWindows = W_INPUT_METHOD)
+    @Test
+    public void testImeInsetsFrozenFlag_resetWhenResized() {
+        final WindowState app = createWindow(null, TYPE_APPLICATION, "app");
+        makeWindowVisibleAndDrawn(app, mImeWindow);
+        mDisplayContent.setImeLayeringTarget(app);
+        mDisplayContent.setImeInputTarget(app);
+
+        // Simulate app is closing and expect the last IME is shown and IME insets is frozen.
+        app.mActivityRecord.commitVisibility(false, false);
+        assertTrue(app.mActivityRecord.mLastImeShown);
+        assertTrue(app.mActivityRecord.mImeInsetsFrozenUntilStartInput);
+
+        // Expect IME insets frozen state will reset when the activity is reparent to the new task.
+        app.mActivityRecord.onResize();
+        assertFalse(app.mActivityRecord.mImeInsetsFrozenUntilStartInput);
+    }
+
+    @UseTestDisplay(addWindows = W_INPUT_METHOD)
+    @Test
+    public void testImeInsetsFrozenFlag_resetWhenNoImeFocusableInActivity() {
+        final WindowState app = createWindow(null, TYPE_APPLICATION, "app");
+        makeWindowVisibleAndDrawn(app, mImeWindow);
+        mDisplayContent.setImeLayeringTarget(app);
+        mDisplayContent.setImeInputTarget(app);
+
+        // Simulate app is closing and expect the last IME is shown and IME insets is frozen.
+        app.mActivityRecord.commitVisibility(false, false);
+        app.mActivityRecord.onWindowsGone();
+
+        assertTrue(app.mActivityRecord.mLastImeShown);
+        assertTrue(app.mActivityRecord.mImeInsetsFrozenUntilStartInput);
+
+        // Expect IME insets frozen state will reset when the activity has no IME focusable window.
+        app.mActivityRecord.forAllWindowsUnchecked(w -> {
+            w.mAttrs.flags |= FLAG_ALT_FOCUSABLE_IM;
+            return true;
+        }, true);
+
+        app.mActivityRecord.commitVisibility(true, false);
+        app.mActivityRecord.onWindowsVisible();
+
+        assertFalse(app.mActivityRecord.mImeInsetsFrozenUntilStartInput);
+    }
+
+    @UseTestDisplay(addWindows = W_INPUT_METHOD)
+    @Test
+    public void testImeInsetsFrozenFlag_resetWhenReportedToBeImeInputTarget() {
+        final WindowState app = createWindow(null, TYPE_APPLICATION, "app");
+
+        InsetsSource imeSource = new InsetsSource(ITYPE_IME);
+        app.getInsetsState().addSource(imeSource);
+        mDisplayContent.setImeLayeringTarget(app);
+        mDisplayContent.updateImeInputAndControlTarget(app);
+
+        InsetsState state = mDisplayContent.getInsetsPolicy().getInsetsForWindow(app);
+        assertFalse(state.getSource(ITYPE_IME).isVisible());
+        assertTrue(state.getSource(ITYPE_IME).getFrame().isEmpty());
+
+        // Simulate app is closing and expect IME insets is frozen.
+        mDisplayContent.mOpeningApps.clear();
+        app.mActivityRecord.commitVisibility(false, false);
+        app.mActivityRecord.onWindowsGone();
+        assertTrue(app.mActivityRecord.mImeInsetsFrozenUntilStartInput);
+
+        // Simulate app re-start input or turning screen off/on then unlocked by un-secure
+        // keyguard to back to the app, expect IME insets is not frozen
+        imeSource.setFrame(new Rect(100, 400, 500, 500));
+        app.getInsetsState().addSource(imeSource);
+        app.getInsetsState().setSourceVisible(ITYPE_IME, true);
+        mDisplayContent.updateImeInputAndControlTarget(app);
+        assertFalse(app.mActivityRecord.mImeInsetsFrozenUntilStartInput);
+
+        // Verify when IME is visible and the app can receive the right IME insets from policy.
+        makeWindowVisibleAndDrawn(app, mImeWindow);
+        state = mDisplayContent.getInsetsPolicy().getInsetsForWindow(app);
+        assertTrue(state.getSource(ITYPE_IME).isVisible());
+        assertEquals(state.getSource(ITYPE_IME).getFrame(), imeSource.getFrame());
     }
 
     private void assertHasStartingWindow(ActivityRecord atoken) {

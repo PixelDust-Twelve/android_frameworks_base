@@ -654,6 +654,12 @@ final class ActivityRecord extends WindowToken implements WindowManagerService.A
     boolean mLastImeShown;
 
     /**
+     * When set to true, the IME insets will be frozen until the next app becomes IME input target.
+     * @see InsetsPolicy#adjustVisibilityForIme
+     */
+    boolean mImeInsetsFrozenUntilStartInput;
+
+    /**
      * A flag to determine if this AR is in the process of closing or entering PIP. This is needed
      * to help AR know that the app is in the process of closing but hasn't yet started closing on
      * the WM side.
@@ -1029,6 +1035,8 @@ final class ActivityRecord extends WindowToken implements WindowManagerService.A
                 pw.print(" forceNewConfig="); pw.println(forceNewConfig);
         pw.print(prefix); pw.print("mActivityType=");
                 pw.println(activityTypeToString(getActivityType()));
+        pw.print(prefix); pw.print("mImeInsetsFrozenUntilStartInput=");
+                pw.println(mImeInsetsFrozenUntilStartInput);
         if (requestedVrComponent != null) {
             pw.print(prefix);
             pw.print("requestedVrComponent=");
@@ -1361,6 +1369,7 @@ final class ActivityRecord extends WindowToken implements WindowManagerService.A
         }
         if (newTask != null && isState(RESUMED)) {
             newTask.setResumedActivity(this, "onParentChanged");
+            mImeInsetsFrozenUntilStartInput = false;
         }
 
         if (rootTask != null && rootTask.topRunningActivity() == this) {
@@ -4126,7 +4135,7 @@ final class ActivityRecord extends WindowToken implements WindowManagerService.A
         // The activity now gets access to the data associated with this Intent.
         mAtmService.mUgmInternal.grantUriPermissionUncheckedFromIntent(intentGrants,
                 getUriPermissionsLocked());
-        final ReferrerIntent rintent = new ReferrerIntent(intent, referrer);
+        final ReferrerIntent rintent = new ReferrerIntent(intent, getFilteredReferrer(referrer));
         boolean unsent = true;
         final boolean isTopActivityWhileSleeping = isTopRunningActivity() && isSleeping();
 
@@ -4744,6 +4753,7 @@ final class ActivityRecord extends WindowToken implements WindowManagerService.A
                     && imeInputTarget.getWindow().mActivityRecord == this
                     && mDisplayContent.mInputMethodWindow != null
                     && mDisplayContent.mInputMethodWindow.isVisible();
+            mImeInsetsFrozenUntilStartInput = true;
         }
 
         final DisplayContent displayContent = getDisplayContent();
@@ -5862,6 +5872,14 @@ final class ActivityRecord extends WindowToken implements WindowManagerService.A
             // closing activity having to wait until idle timeout to be stopped or destroyed if the
             // next activity won't report idle (e.g. repeated view animation).
             mTaskSupervisor.scheduleProcessStoppingAndFinishingActivitiesIfNeeded();
+
+            // If the activity is visible, but no windows are eligible to start input, unfreeze
+            // to avoid permanently frozen IME insets.
+            if (mImeInsetsFrozenUntilStartInput && getWindow(
+                    win -> WindowManager.LayoutParams.mayUseInputMethod(win.mAttrs.flags))
+                    == null) {
+                mImeInsetsFrozenUntilStartInput = false;
+            }
         }
     }
 
@@ -7778,6 +7796,13 @@ final class ActivityRecord extends WindowToken implements WindowManagerService.A
         }
     }
 
+    @Override
+    void onResize() {
+        // Reset freezing IME insets flag when the activity resized.
+        mImeInsetsFrozenUntilStartInput = false;
+        super.onResize();
+    }
+
     /** Returns true if the configuration is compatible with this activity. */
     boolean isConfigurationCompatible(Configuration config) {
         final int orientation = getRequestedOrientation();
@@ -8465,6 +8490,19 @@ final class ActivityRecord extends WindowToken implements WindowManagerService.A
 
     int getLaunchedFromUid() {
         return launchedFromUid;
+    }
+
+    /**
+     * Gets the referrer package name with respect to package visibility. This method returns null
+     * if the given package is not visible to this activity.
+     */
+    String getFilteredReferrer(String referrerPackage) {
+        if (referrerPackage == null || (!referrerPackage.equals(packageName)
+                && mWmService.mPmInternal.filterAppAccess(
+                        referrerPackage, info.applicationInfo.uid, mUserId))) {
+            return null;
+        }
+        return referrerPackage;
     }
 
     /**
