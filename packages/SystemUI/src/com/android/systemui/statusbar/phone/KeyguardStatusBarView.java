@@ -67,6 +67,8 @@ import com.android.systemui.statusbar.policy.UserInfoController;
 import com.android.systemui.statusbar.policy.UserInfoController.OnUserInfoChangedListener;
 import com.android.systemui.statusbar.policy.UserInfoControllerImpl;
 
+import com.android.systemui.pixeldust.carrierlabel.CarrierLabel;
+
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -247,9 +249,11 @@ public class KeyguardStatusBarView extends RelativeLayout implements
         mBatteryView.setForceShowPercent(mBatteryCharging && mShowPercentAvailable);
         if (mCarrierLabel != null) {
             if (mShowCarrierLabel == 1 || mShowCarrierLabel == 3) {
+                ((CarrierLabel)mCarrierLabel).updateKeyguardState(true);
                 mCarrierLabel.setVisibility(View.VISIBLE);
                 mCarrierLabel.setSelected(true);
             } else {
+                ((CarrierLabel)mCarrierLabel).updateKeyguardState(false);
                 mCarrierLabel.setVisibility(View.GONE);
                 mCarrierLabel.setSelected(false);
             }
@@ -529,7 +533,7 @@ public class KeyguardStatusBarView extends RelativeLayout implements
                 Color.luminance(textColor) < 0.5 ? R.color.dark_mode_icon_color_single_tone :
                 R.color.light_mode_icon_color_single_tone);
         float intensity = textColor == Color.WHITE ? 0 : 1;
-        mCarrierLabel.setTextColor(iconColor);
+        //mCarrierLabel.setTextColor(iconColor);
         if (mIconManager != null) {
             mIconManager.setTint(iconColor);
         }
