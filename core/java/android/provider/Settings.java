@@ -5416,10 +5416,10 @@ public final class Settings {
         public static final String SHOW_FOURG_ICON = "show_fourg_icon";
 
         /**
-         * Whether to show VoLTE/VoWiFi icon or not
+         * Whether to show VoLTE icon or not
          * @hide
          */
-        public static final String SHOW_VOLTE_VOWIFI_ICON = "ims_icon";
+        public static final String SHOW_VOLTE_ICON = "volte_icon";
 
         /**
          * Disable power menu on secure lock screens
