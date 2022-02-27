@@ -28,9 +28,6 @@
     <!-- AoD battery bar -->
     <dimen name="battery_bar_view_height">4dp</dimen>
 
-    <!-- Network traffic font size -->
-    <dimen name="net_traffic_multi_text_size">18dp</dimen>
-
     <!-- Dialog margin -->
     <dimen name="rdnt_margin_dialog">12dp</dimen>
 </resources>

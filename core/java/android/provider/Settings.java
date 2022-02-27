@@ -5685,42 +5685,6 @@ public final class Settings {
         public static final String LOCKSCREEN_SMALL_CLOCK = "lockscreen_small_clock";
 
         /**
-         * Whether to show network traffic indicator in statusbar
-         * @hide
-         */
-        public static final String NETWORK_TRAFFIC_STATE = "network_traffic_state";
-
-        /**
-         * Where to show network traffic indicator
-         * @hide
-         */
-        public static final String NETWORK_TRAFFIC_LOCATION = "network_traffic_location";
-
-        /**
-         * Network traffic inactivity threshold (default is 1 kBs)
-         * @hide
-         */
-        public static final String NETWORK_TRAFFIC_AUTOHIDE_THRESHOLD = "network_traffic_autohide_threshold";
-
-        /**
-         * Specify refresh duration for network traffic
-         * @hide
-         */
-        public static final String NETWORK_TRAFFIC_REFRESH_INTERVAL = "network_traffic_refresh_interval";
-
-        /**
-         * What to show in the network traffic indicator
-         * @hide
-         */
-        public static final String NETWORK_TRAFFIC_MODE = "network_traffic_mode";
-
-        /**
-         * What size to show for network traffic indicator in statusbar
-         * @hide
-         */
-        public static final String NETWORK_TRAFFIC_FONT_SIZE = "network_traffic_font_size";
-
-        /**
          * Whether to show battery percent on ambient bottom
          * @hide
          */

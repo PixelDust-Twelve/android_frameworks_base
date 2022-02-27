@@ -4052,8 +4052,6 @@ public class StatusBar extends SystemUI implements DemoMode,
             ((AmbientIndicationContainer)mAmbientIndicationContainer)
                     .updateKeyguardState(mState == StatusBarState.KEYGUARD);
         }
-
-        ((StatusBarIconControllerImpl) mStatusBarIconController).setKeyguardShowing(mState == StatusBarState.KEYGUARD);
         Trace.endSection();
     }
 
