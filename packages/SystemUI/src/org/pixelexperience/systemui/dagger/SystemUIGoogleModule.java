@@ -78,10 +78,11 @@ import com.google.android.systemui.reversecharging.ReverseChargingController;
 import com.google.android.systemui.statusbar.KeyguardIndicationControllerGoogle;
 import com.google.android.systemui.statusbar.policy.BatteryControllerImplGoogle;
 
+import com.pixeldust.android.systemui.qs.tileimpl.QSFactoryImplPixeldust;
+
 import org.pixelexperience.systemui.assist.AssistManagerGoogle;
 import org.pixelexperience.systemui.power.dagger.PowerModuleGoogle;
 import org.pixelexperience.systemui.qs.dagger.QSModuleGoogle;
-import org.pixelexperience.systemui.qs.tileimpl.QSFactoryImplGoogle;
 
 import javax.inject.Named;
 
@@ -185,7 +186,7 @@ public abstract class SystemUIGoogleModule {
 
     @Binds
     @SysUISingleton
-    public abstract QSFactory bindQSFactory(QSFactoryImplGoogle qsFactoryImpl);
+    public abstract QSFactory bindQSFactory(QSFactoryImplPixeldust qsFactoryImpl);
 
     @Binds
     abstract DockManager bindDockManager(DockObserver dockManager);
