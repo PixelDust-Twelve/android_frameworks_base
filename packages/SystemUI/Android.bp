@@ -85,6 +85,7 @@ android_library {
         "res-keyguard",
         "res",
         "res-hwkeys",
+        "res-pixeldust",
     ],
     static_libs: [
         "WindowManager-Shell",

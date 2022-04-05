@@ -53,6 +53,15 @@ import com.android.systemui.qs.tiles.WifiTile;
 import com.android.systemui.qs.tiles.WorkModeTile;
 import com.android.systemui.util.leak.GarbageMonitor;
 
+// Custom tiles
+import com.pixeldust.android.systemui.qs.tiles.AODTile;
+import com.pixeldust.android.systemui.qs.tiles.CaffeineTile;
+import com.pixeldust.android.systemui.qs.tiles.DataSwitchTile;
+import com.pixeldust.android.systemui.qs.tiles.LocaleTile;
+import com.pixeldust.android.systemui.qs.tiles.PDSettingsTile;
+import com.pixeldust.android.systemui.qs.tiles.SyncTile;
+import com.pixeldust.android.systemui.qs.tiles.VpnTile;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -90,6 +99,14 @@ public class QSFactoryImpl implements QSFactory {
     private final Provider<DeviceControlsTile> mDeviceControlsTileProvider;
     private final Provider<AlarmTile> mAlarmTileProvider;
     private final Provider<QuickAccessWalletTile> mQuickAccessWalletTileProvider;
+    // custom tiles
+    private final Provider<CaffeineTile> mCaffeineTileProvider;
+    private final Provider<SyncTile> mSyncTileProvider;
+    private final Provider<VpnTile> mVpnTileProvider;
+    private final Provider<AODTile> mAODTileProvider;
+    private final Provider<DataSwitchTile> mDataSwitchTileProvider;
+    private final Provider<PDSettingsTile> mPDSettingsTileProvider;
+    private final Provider<LocaleTile> mLocaleTileProvider;
 
     private final Lazy<QSHost> mQsHostLazy;
     private final Provider<CustomTile.Builder> mCustomTileBuilderProvider;
@@ -124,6 +141,13 @@ public class QSFactoryImpl implements QSFactory {
             Provider<MicrophoneToggleTile> microphoneToggleTileProvider,
             Provider<DeviceControlsTile> deviceControlsTileProvider,
             Provider<AlarmTile> alarmTileProvider,
+            Provider<CaffeineTile> caffeineTileProvider,
+            Provider<SyncTile> syncTileProvider,
+            Provider<VpnTile> vpnTileProvider,
+            Provider<AODTile> aodTileProvider,
+            Provider<DataSwitchTile> dataSwitchTileProvider,
+            Provider<PDSettingsTile> pdSettingsTileProvider,
+            Provider<LocaleTile> localeTileProvider,
             Provider<QuickAccessWalletTile> quickAccessWalletTileProvider) {
         mQsHostLazy = qsHostLazy;
         mCustomTileBuilderProvider = customTileBuilderProvider;
@@ -155,6 +179,14 @@ public class QSFactoryImpl implements QSFactory {
         mDeviceControlsTileProvider = deviceControlsTileProvider;
         mAlarmTileProvider = alarmTileProvider;
         mQuickAccessWalletTileProvider = quickAccessWalletTileProvider;
+        // custom tiles
+        mCaffeineTileProvider = caffeineTileProvider;
+        mSyncTileProvider = syncTileProvider;
+        mVpnTileProvider = vpnTileProvider;
+        mAODTileProvider = aodTileProvider;
+        mDataSwitchTileProvider = dataSwitchTileProvider;
+        mPDSettingsTileProvider = pdSettingsTileProvider;
+        mLocaleTileProvider = localeTileProvider;
     }
 
     public QSTile createTile(String tileSpec) {
@@ -221,6 +253,20 @@ public class QSFactoryImpl implements QSFactory {
                 return mAlarmTileProvider.get();
             case "wallet":
                 return mQuickAccessWalletTileProvider.get();
+            case "caffeine":
+                return mCaffeineTileProvider.get();
+            case "sync":
+                return mSyncTileProvider.get();
+            case "vpn":
+                return mVpnTileProvider.get();
+            case "aod":
+                return mAODTileProvider.get();
+            case "dataswitch":
+                return mDataSwitchTileProvider.get();
+            case "pixeldust_settings":
+                return mPDSettingsTileProvider.get();
+            case "locale":
+                return mLocaleTileProvider.get();
         }
 
         // Custom tiles
