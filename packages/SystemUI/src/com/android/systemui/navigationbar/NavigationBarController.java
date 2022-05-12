@@ -306,6 +306,9 @@ public class NavigationBarController implements
         final Context context = isOnDefaultDisplay
                 ? mContext
                 : mContext.createDisplayContext(display);
+        if (!wm.hasSoftNavigationBar(context, displayId)) {
+            return;
+        }
         NavigationBar navBar = mNavigationBarFactory.create(context);
 
         mNavigationBars.put(displayId, navBar);

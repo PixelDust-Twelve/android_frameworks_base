@@ -4042,8 +4042,7 @@ public class StatusBar extends SystemUI implements
                     Settings.Secure.PULSE_ON_NEW_TRACKS))) {
                 setPulseOnNewTracks();
             } else if (uri.equals(Settings.System.getUriFor(
-                    Settings.System.NAVIGATION_BAR_SHOW)) && mDisplayId == Display.DEFAULT_DISPLAY &&
-                mWindowManagerService != null) {
+                    Settings.System.NAVIGATION_BAR_SHOW))) {
                 setNavBarVisibility();
             }
         }
@@ -4059,18 +4058,21 @@ public class StatusBar extends SystemUI implements
     }
 
     private void setNavBarVisibility() {
-        boolean navbarEnabled = NavbarUtils.isEnabled(mContext);
-        boolean hasNavbar = getNavigationBarView() != null;
-        if (navbarEnabled) {
-            if (!hasNavbar) {
-                mNavigationBarController.onDisplayReady(mDisplayId);
-                setNavBarInteractionMode(getOldNavBarModeOverlay());
-            }
-        } else {
-            saveNavBarCurrentModeOverlay();
-            setNavBarInteractionMode(NAV_BAR_MODE_3BUTTON_OVERLAY);
-            if (hasNavbar) {
-                mNavigationBarController.onDisplayRemoved(mDisplayId);
+        if (mDisplayId == Display.DEFAULT_DISPLAY &&
+                mWindowManagerService != null) {
+            boolean navbarEnabled = NavbarUtils.isEnabled(mContext);
+            boolean hasNavbar = getNavigationBarView() != null;
+            if (navbarEnabled) {
+                if (!hasNavbar) {
+                    mNavigationBarController.onDisplayReady(mDisplayId);
+                    setNavBarInteractionMode(getOldNavBarModeOverlay());
+                }
+            } else {
+                saveNavBarCurrentModeOverlay();
+                setNavBarInteractionMode(NAV_BAR_MODE_3BUTTON_OVERLAY);
+                if (hasNavbar) {
+                    mNavigationBarController.onDisplayRemoved(mDisplayId);
+                }
             }
         }
     }
