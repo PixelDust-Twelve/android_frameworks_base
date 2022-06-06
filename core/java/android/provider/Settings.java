@@ -6001,6 +6001,11 @@ public final class Settings {
         public static final String OMNI_QS_TILE_LABEL_HIDE = "qs_tile_label_hide";
 
         /**
+         * @hide
+         */
+        public static final String OMNI_QS_QUICKBAR_COLUMNS = "qs_quickbar_columns";
+
+        /**
          * These are all public system settings
          *
          * @hide

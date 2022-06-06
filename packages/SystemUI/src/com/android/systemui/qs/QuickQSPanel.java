@@ -17,7 +17,11 @@
 package com.android.systemui.qs;
 
 import android.content.Context;
+import android.content.ContentResolver;
 import android.content.res.Configuration;
+import android.graphics.Rect;
+import android.os.UserHandle;
+import android.provider.Settings;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -38,6 +42,7 @@ public class QuickQSPanel extends QSPanel {
     // A fallback value for max tiles number when setting via Tuner (parseNumTiles)
     public static final int TUNER_MAX_TILES_FALLBACK = 6;
     public static final int DEFAULT_MIN_TILES = 4;
+    public static final int MIN_NUM_TILES = 2;
 
     private boolean mDisabledByPolicy;
     private int mMaxTiles;
@@ -101,7 +106,10 @@ public class QuickQSPanel extends QSPanel {
     }
 
     public void setMaxTiles(int maxTiles) {
-        mMaxTiles = Math.max(DEFAULT_MIN_TILES, maxTiles);
+        int qsColumns = Settings.System.getIntForUser(
+                mContext.getContentResolver(), Settings.System.OMNI_QS_QUICKBAR_COLUMNS,
+                maxTiles, UserHandle.USER_CURRENT);
+        mMaxTiles = Math.max(MIN_NUM_TILES, qsColumns);
     }
 
     @Override
@@ -255,7 +263,14 @@ public class QuickQSPanel extends QSPanel {
 
         @Override
         public void updateSettings() {
-            mQSPanel.setMaxTiles(getResourceColumns());
+            int qsColumns = Settings.System.getIntForUser(
+                    mContext.getContentResolver(), Settings.System.OMNI_QS_QUICKBAR_COLUMNS,
+                    DEFAULT_MIN_TILES, UserHandle.USER_CURRENT);
+            if (qsColumns == -1) {
+                mQSPanel.setMaxTiles(getResourceColumns());
+            } else {
+                mQSPanel.setMaxTiles(Math.max(MIN_NUM_TILES, qsColumns));
+            }
             super.updateSettings();
         }
     }

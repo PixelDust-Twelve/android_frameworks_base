@@ -147,6 +147,7 @@ public class QSAnimator implements Callback, PageListener, Listener, OnLayoutCha
             Log.w(TAG, "QS Not using page layout");
         }
         mQsPanelController.setPageListener(this);
+        updateSettings();
     }
 
     public void onRtlChanged() {
@@ -721,5 +722,10 @@ public class QSAnimator implements Callback, PageListener, Listener, OnLayoutCha
                 }
             }
         }
+    }
+
+    public void updateSettings() {
+        mNumQuickTiles = mQuickQsPanel.getNumQuickTiles();
+        clearAnimationState();
     }
 }
