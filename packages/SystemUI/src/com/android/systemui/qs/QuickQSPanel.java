@@ -253,6 +253,7 @@ public class QuickQSPanel extends QSPanel {
             return PixeldustUtils.getQuickQSColumnsCount(mContext, columns);
         }
 
+        @Override
         public int getMaxTiles() {
             int columns = getResources().getInteger(R.integer.quick_qs_panel_max_tiles);
             return PixeldustUtils.getQuickQSMaxTilesCount(mContext, columns);

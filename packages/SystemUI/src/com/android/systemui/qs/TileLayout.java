@@ -22,6 +22,7 @@ import java.util.ArrayList;
 public class TileLayout extends ViewGroup implements QSTileLayout {
 
     public static final int NO_MAX_COLUMNS = 100;
+    public static final int DEFAULT_TILES_COUNT = 4;
 
     private static final String TAG = "TileLayout";
 
@@ -306,8 +307,13 @@ public class TileLayout extends ViewGroup implements QSTileLayout {
     }
 
     @Override
-    public void updateSettings() {
+    public int getMaxTiles() {
+        int columns = getResources().getInteger(R.integer.quick_qs_panel_max_tiles);
+        return PixeldustUtils.getQuickQSMaxTilesCount(mContext, columns);
+    }
 
+    @Override
+    public void updateSettings() {
         setMaxColumns(getResourceColumns());
         requestLayout();
     }
