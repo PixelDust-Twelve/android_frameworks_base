@@ -307,6 +307,7 @@ public class TileLayout extends ViewGroup implements QSTileLayout {
 
     @Override
     public void updateSettings() {
+
         setMaxColumns(getResourceColumns());
         requestLayout();
     }
