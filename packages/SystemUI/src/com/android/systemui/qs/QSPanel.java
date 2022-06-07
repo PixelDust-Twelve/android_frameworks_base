@@ -729,7 +729,7 @@ public class QSPanel extends LinearLayout implements Tunable {
                 if (mTileLayout.getResourceColumns() == 2) {
                     value = 2; // if QS columns = 2 then set MinRows = 2
                 }
-                mTileLayout.setMinRows(horizontal ? 2 : value);
+                mTileLayout.setMinRows(horizontal ? value : 1);
                 mTileLayout.setMaxColumns(horizontal ? mTileLayout.getResourceColumns() / 2 : mTileLayout.getResourceColumns());
             }
             updateMargins(mediaHostView);
