@@ -1531,6 +1531,14 @@ public final class NotificationRecord {
         return mPendingLogUpdate;
     }
 
+    public void setIsBubbleUpSuppressedByAppLock(boolean suppressed) {
+        mIsBubbleUpSuppressedByAppLock = suppressed;
+    }
+
+    public boolean isBubbleUpSuppressedByAppLock() {
+        return mIsBubbleUpSuppressedByAppLock;
+    }
+
     /**
      * Merge the given set of phone numbers into the list of phone numbers that
      * are cached on this notification record.
