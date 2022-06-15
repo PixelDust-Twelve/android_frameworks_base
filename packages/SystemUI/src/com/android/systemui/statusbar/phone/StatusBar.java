@@ -4022,6 +4022,9 @@ public class StatusBar extends SystemUI implements
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NAVIGATION_BAR_SHOW),
                     false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QS_TRANSPARENCY),
+                    false, this, UserHandle.USER_ALL);
         }
 
         @Override
@@ -4048,6 +4051,9 @@ public class StatusBar extends SystemUI implements
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.NAVIGATION_BAR_SHOW))) {
                 setNavBarVisibility();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.QS_TRANSPARENCY))) {
+                setCustomScrimAlpha();
             }
         }
 
@@ -4058,7 +4064,16 @@ public class StatusBar extends SystemUI implements
             setLockScreenMediaArt();         
             setPulseOnNewTracks();
             setNavBarVisibility();
+            setCustomScrimAlpha();
         }
+    }
+
+    private void setCustomScrimAlpha() {
+        int mCustomScrimAlpha = (int)Settings.System.getFloatForUser(
+            mContext.getContentResolver(),
+            Settings.System.QS_TRANSPARENCY, 100,
+            UserHandle.USER_CURRENT);
+        mScrimController.setCustomScrimAlpha(mCustomScrimAlpha);
     }
 
     private void setNavBarVisibility() {
