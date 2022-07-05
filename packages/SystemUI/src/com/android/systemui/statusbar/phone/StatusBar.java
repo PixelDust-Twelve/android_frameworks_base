@@ -4010,12 +4010,6 @@ public class StatusBar extends SystemUI implements
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_QUICK_QS_PULLDOWN),
                     false, this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.LOCKSCREEN_MEDIA_BLUR),
-                    false, this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.SHOW_LOCKSCREEN_MEDIA_ART),
-                    false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.Secure.getUriFor(
                     Settings.Secure.PULSE_ON_NEW_TRACKS),
                     false, this, UserHandle.USER_ALL);
@@ -4039,12 +4033,6 @@ public class StatusBar extends SystemUI implements
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_QUICK_QS_PULLDOWN))) {
                 setStatusBarWindowViewOptions();
-            } else if (uri.equals(Settings.System.getUriFor(
-                    Settings.System.LOCKSCREEN_MEDIA_BLUR))) {
-                setLockScreenMediaBlurLevel();
-            }  else if (uri.equals(Settings.System.getUriFor(
-                    Settings.System.SHOW_LOCKSCREEN_MEDIA_ART))) {
-                setLockScreenMediaArt();
             } else if (uri.equals(Settings.Secure.getUriFor(
                     Settings.Secure.PULSE_ON_NEW_TRACKS))) {
                 setPulseOnNewTracks();
@@ -4060,8 +4048,6 @@ public class StatusBar extends SystemUI implements
         public void update() {
             setLockscreenDoubleTapToSleep();
             setStatusBarWindowViewOptions();
-            setLockScreenMediaBlurLevel();
-            setLockScreenMediaArt();         
             setPulseOnNewTracks();
             setNavBarVisibility();
             setCustomScrimAlpha();
@@ -4105,18 +4091,6 @@ public class StatusBar extends SystemUI implements
     private void setStatusBarWindowViewOptions() {
         if (mNotificationShadeWindowViewController != null) {
             mNotificationShadeWindowViewController.setStatusBarWindowViewOptions();
-        }
-    }
-
-    private void setLockScreenMediaBlurLevel() {
-        if (mMediaManager != null) {
-            mMediaManager.setLockScreenMediaBlurLevel();
-        }
-    }
-
-    private void setLockScreenMediaArt() {
-        if (mMediaManager != null) {
-            mMediaManager.setLockScreenMediaArt();
         }
     }
 
